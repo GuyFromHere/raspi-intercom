@@ -49,6 +49,37 @@ Sleep 3
 New-VMSwitch -Name $PrivateSwitchProperties.Name -SwitchType $PrivateSwitchProperties.SwitchType
 New-VMSwitch -Name $InternalSwitchProperties.Name -SwitchType $InternalSwitchProperties.SwitchType
 
+# Create internal NAT switches
+$GwIp = "10.1.0.1"
+$SnetPrefixLength = "24"
+$SwitchName = "sw-nat-01"
+$NatName = "nat-01"
+$SnetPrefix = "10.1.0.0/" + $SnetPrefixLength
+
+$GwIp = "10.2.0.1"
+$SnetPrefixLength = "24"
+$SwitchName = "sw-nat-02"
+$NatName = "nat-02"
+$SnetPrefix = "10.2.0.0/" + $SnetPrefixLength
+
+New-VMSwitch -SwitchName $SwitchName -SwitchType Internal
+$NewNetAdapter = Get-NetAdapter | Sort -Property IfIndex | Select-Object -Last 1
+New-NetIPAddress -IPAddress $GwIp -PrefixLength $SnetPrefixLength -InterfaceIndex $NewNetAdapter.ifIndex
+# Configure NET network
+New-NetNat -Name $NatName -InternalIPInterfaceAddressPrefix $SnetPrefix
+<#
+Remove-VMSwitch $SwitchName
+Remove-NetIPAddress -IPAddress $GwIp
+Remove-NetNat -Name $NatName
+#>
+
+New-VMSwitch -SwitchName $SwitchName -SwitchType Internal
+$NewNetAdapter = Get-NetAdapter | Sort -Property IfIndex | Select-Object -Last 1
+New-NetIPAddress -IPAddress $GwIp -PrefixLength $SnetPrefixLength -InterfaceIndex $NewNetAdapter.ifIndex
+# Configure NET network
+New-NetNat -Name $NatName -InternalIPInterfaceAddressPrefix $SnetPrefix
+
+
 # Now the VMs
 $Name.ForEach{
     # Create VHD for each VM
