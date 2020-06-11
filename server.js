@@ -21,7 +21,7 @@ mongoose
 	.catch((err) => console.log(err));
 
 // use routes
-app.use("/api/letters", require("./routes/letters"));
+app.use("/api/message", require("./routes/message_api"));
 
 // Server static assets if we're in production
 if (process.env.NODE_ENV === "production") {
