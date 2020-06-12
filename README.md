@@ -6,8 +6,29 @@ Voice intercom system connecting two raspberry pis
 
 My in laws built a house next door. We bought a mesh wifi system to share our internet connection and we would like to have a convenient and efficient method of communicating between the houses. 
 
-My tentative plan is to build a Node application that runs on two raspberry pis connected to the same network. A user can record a short message and send it to the other pi's "inbox" where it can be played back, saved, or deleted. There will need to be some kind of user interface eventually...probably a small touchscreen. I haven't gotten that far in the planning stages yet. Alternatively I could look in to something like web sockets to send a message in real time like a genuine analog intercom but I thought recording a message would be as easier place to start. I guess we'll find out pretty soon if I was right!
+My plan is to start with the pieces I think I can accomplish with my current skills and build out the features I really want after I have a functional solution.
 
-# Workflow
+# Basic functionality
 
-Pi A resides in House A. Use connects to local server running on that device and records a message. Pi A connects to the DB server on Pi B and uploads the message. Pi B's state changes to show the message waiting to be heard / read.
+
+Stage 1: 
+
+Two pis running a database app with a simple React UI displayed on a touchscreen
+
+The UI has functionality to select one or more devices (can also be used on a phone to send messages to both devices at once)
+
+User selects which device dbs they want to broadcast to then clicks the record button
+
+They have five or ten seconds to record a message
+
+When they take their hand off the button the message is posted to the target database
+
+The device listening to that database updates its state to show that there are un-heard messagesT
+
+A listener can listen to a message and mark it for deletion
+
+Stage 2:
+
+Websockets for real time messaging via the phone UI
+
+Physical buttons on the pis so they act like analog intercoms

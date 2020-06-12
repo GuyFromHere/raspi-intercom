@@ -8,11 +8,12 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // Body Parser middleware
+// Limit the size of the body to 5mb
 app.use(express.json({ limit: "5mb" }));
 
 // connect to DB
 mongoose
-	.connect(process.env.MONGODB_URI || config.get("mongoURI"), {
+	.connect(process.env.MONGODB_URI || config.get("MONGODB_URI"), {
 		useNewUrlParser: true,
 		useCreateIndex: true,
 		useUnifiedTopology: true,
