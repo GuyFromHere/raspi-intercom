@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script type="text/javascript">
+            function handleClick() {
+                console.log('you clicked me')
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="nav">
+                <button onclick="handleClick();">CLICK TO RECORD</button>
+            </div>
+        
+            <table>
+                <thead>
+                    <th>Date</th>
+                    <th>Length</th>
+                    <th>Played</th>
+                    <th>Delete</th>
+                </thead>
+                <tbody>
+                    <tr class="unplayed">
+                        <td>Today, 9:32 AM</td>
+                        <td>:21</td>
+                        <td><input id="3" class="delete-message-check" type="checkbox"></td>
+                    </tr>
+                    <tr class="unplayed">
+                        <td>Today, 9:17 AM</td>
+                        <td>:45</td>
+                        <td><input id="2" class="delete-message-check" type="checkbox"></td>
+                    </tr>
+                    <tr class="played">
+                        <td>June 12, 8:10 AM</td>
+                        <td>1:05</td>
+                        <td><input id="1" class="delete-message-check" type="checkbox"></td>
+                    </tr>
+                    <tr class="played">
+                        <td>June 12, 5:18 PM</td>
+                        <td>1:07</td>
+                        <td><input id="0" class="delete-message-check" type="checkbox"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

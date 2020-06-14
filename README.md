@@ -8,8 +8,19 @@ My in laws built a house next door. We bought a mesh wifi system to share our in
 
 My plan is to start with the pieces I think I can accomplish with my current skills and build out the features I really want after I have a functional solution.
 
-# Basic functionality
+# Instructions 
 
+## Set up dev environment
+
+For my development environment I'm using Hyper-V with two VMs running Raspbian Buster to simulate the hardware I'll be using. I am running them and the Node server from my laptop. This means I need to set up virtual switches with a static NAT so they can use my wireless card without disrupting my internet connection. The alternative would be using an internal switch bound to a spare NIC. That could work if I stayed at my desk at all times, but I like to work from my couch. There's better dog-snuggling over there. 
+
+To provision the VMs and switches I wrote the powershell script in **setup/Create-RaspbianVm.ps1**. All the properties for the VMs and the switches are defined in the top part of the script. Before running make sure you edit these to suit your own needs. 
+
+The VMs will boot to the specified Raspbian ISO when the script finishes. You'll need to walk through the installer and configure the static IPs to match the given subnet. 
+
+In Raspbian Buster you need to set a static ip in **/etc/dhcpcd.conf**. Make sure you're setting it on the correct interface! eth0 should be assigned to the private switch since that's the one we're attaching in the New-VM command. eth1 is the one that needs a static IP on your NAT switch. I've included a script that will auto create a new dhcpcd.conf file on a mounted Raspbian image in WSL2. If you don't have WSL2 (or access to any other means to mount, edit, then convert the img file) you will have to manually change the file after installing Raspbian.
+
+# Basic functionality
 
 Stage 1: 
 
