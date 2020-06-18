@@ -8,7 +8,8 @@ export default {
     },
     // Send a new message to the destination database.
     sendMessage: function (message) {
-        return axios.post('/api/message/send', message)
+        console.log('client api send message')
+        return axios.post('/api/message/send', {message: message})
     },
     // Clear a message once it has been listened to.
     deleteMessage: function (id) {

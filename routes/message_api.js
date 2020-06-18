@@ -14,19 +14,24 @@ router.get("/", (req, res) => {
     Message.find().then(result => {
         if ( result.length > 0 ) {
             //res.json(result);
-            res.json({ status: "shockingly there are messages" });
+            console.log('GET /api/message');
+            //console.log(result);
+            res.json(result);
         } else {
             res.json({ status: "no messages" });
         }
     })
 })
 
-// @route   POST /api/messate/send/
+// @route   POST /api/message/send/
 // @desc    Posts the recorded message to the target database
 // @access  Public
 router.post("/send", (req, res) => {
     // get recorded message data and store it in the database
-    const newObj = req.body;
+    const newObj = {
+        message: req.body.message,
+        played: false
+    };
     // send result to DB on the other device...
     Message.create(newObj).then(result => {
         res.json(result)

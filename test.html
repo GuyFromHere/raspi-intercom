@@ -5,48 +5,175 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
-        <script type="text/javascript">
-            function handleClick() {
-                console.log('you clicked me')
+        
+        <style>
+            .container {
+                display: flex;
+                flex-direction: column;
+                text-align: center;
             }
-        </script>
+            .record {
+                height: 20px;
+                width: 20px;
+                border: 1px solid black;
+                border-radius: 50%;
+                background-color: red;
+            }
+
+            .play {
+                width: 0; 
+                height: 0; 
+                border-top: 10px solid transparent;
+                border-bottom: 10px solid transparent;
+                border-left: 14px solid blue;
+            }
+
+            .unplayed:hover {
+                background-color: darkkhaki;
+                
+            }
+
+            .played {
+                background-color: lightgray;
+                color: darkgray;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
             <div class="nav">
-                <button onclick="handleClick();">CLICK TO RECORD</button>
+                RECORD A MESSAGE:
+                <button class="record"></button>
+                STOP RECORDING:
+                <button class="stop">Stop</button>
             </div>
         
             <table>
-                <thead>
-                    <th>Date</th>
-                    <th>Length</th>
-                    <th>Played</th>
-                    <th>Delete</th>
-                </thead>
-                <tbody>
                     <tr class="unplayed">
                         <td>Today, 9:32 AM</td>
                         <td>:21</td>
-                        <td><input id="3" class="delete-message-check" type="checkbox"></td>
+                        <td>
+                            <div class="audio">
+                                <div class="play"></div>
+                            </div>
+                        </td>
+                        <td><button id="3" class="delete">Delete</button></td>
                     </tr>
                     <tr class="unplayed">
                         <td>Today, 9:17 AM</td>
                         <td>:45</td>
-                        <td><input id="2" class="delete-message-check" type="checkbox"></td>
+                        <td>
+                            <div class="audio">
+                                <div class="play"></div>
+                            </div>
+                        </td>
+                        <td><button id="2" class="delete">Delete</button></td>
                     </tr>
                     <tr class="played">
                         <td>June 12, 8:10 AM</td>
                         <td>1:05</td>
-                        <td><input id="1" class="delete-message-check" type="checkbox"></td>
+                        <td>
+                            <div class="audio">
+                                <div class="play"></div>
+                            </div>
+                        </td>
+                        <td><button id="1" class="delete">Delete</button></td>
                     </tr>
                     <tr class="played">
                         <td>June 12, 5:18 PM</td>
                         <td>1:07</td>
-                        <td><input id="0" class="delete-message-check" type="checkbox"></td>
+                        <td>
+                            <div class="audio">
+                                <div class="play"></div>
+                            </div>
+                        </td>
+                        <td><button id="0" class="delete">Delete</button></td>
                     </tr>
                 </tbody>
             </table>
+            <div class="sound-clips"></div>
         </div>
+        <script type="text/javascript">
+            const record = document.querySelector('.record');
+            const play = document.querySelector('.play');
+            const stop = document.querySelector('.stop');
+            const soundClips = document.querySelector('.sound-clips');
+            // Array to hold the audio chunks
+            let chunks = [];
+            const constraints = { audio: true };
+
+            function getBase64Audio(file) {
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = () => {
+                    var base64data = reader.result;
+                    console.log(base64data);
+                }
+            }
+
+            // get microphone and create mediarecorder when the page loads
+            navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+                const mediaRecorder = new MediaRecorder(stream);
+
+                // create event handlers for the start and stop buttons
+                
+                record.onclick = function() {
+                    mediaRecorder.start();
+                    console.log(mediaRecorder.state);
+                    console.log('recorder started');
+                    
+                }
+                
+                stop.onclick = function() {
+                    mediaRecorder.stop();
+                    console.log(mediaRecorder.state);
+                    console.log("recorder stopped");
+                }
+
+                mediaRecorder.onstop = function(e) {
+                    console.log("data available after MediaRecorder.stop() called.")
+
+                    var clipName = prompt('Enter a name for your sound clip');
+
+                    var clipContainer = document.createElement('article');
+                    var clipLabel = document.createElement('p');
+                    var audio = document.createElement('audio');
+                    var deleteButton = document.createElement('button');
+                    
+                    clipContainer.classList.add('clip');
+                    audio.setAttribute('controls', '');
+                    deleteButton.innerHTML = "Delete";
+                    clipLabel.innerHTML = clipName;
+
+                    clipContainer.appendChild(audio);
+                    clipContainer.appendChild(clipLabel);
+                    clipContainer.appendChild(deleteButton);
+                    soundClips.appendChild(clipContainer);
+
+                    audio.controls = true;
+                    var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+                    chunks = [];
+                    var audioURL = URL.createObjectURL(blob);
+                    audio.src = audioURL;
+                    console.log("recorder stopped");
+
+                    console.log('test base64 conversion')
+                    getBase64Audio(blob);
+                    deleteButton.onclick = function(e) {
+                        evtTgt = e.target;
+                        evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+                    }
+
+                }
+
+                mediaRecorder.ondataavailable = function(e) {
+                   chunks.push(e.data);
+                }
+            }).catch(function(err) {
+                console.log('The following error occurred: ' + err);
+            });
+
+        
+        </script>
     </body>
 </html>

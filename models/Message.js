@@ -2,16 +2,18 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema({
-	fileName: {
+	// messageUri stores the Base64 encoded binary stream data 
+	message: {
 		type: String,
-		required: false,
+		required: true,
 	},
-	text: {
-		type: String,
-		required: false
+	date: {
+		type: Date,
+		required: true,
+		default: Date.now
 	},
-	type: {
-		type: String,
+	played: {
+		type: Boolean,
 		required: true,
 	},
 });
