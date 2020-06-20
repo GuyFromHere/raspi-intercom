@@ -5,6 +5,12 @@ import './style.css';
 import API from '../../utils/api';
 
 class Home extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+          messages: []
+        };
+      }
 
     getBase64Audio = (file) => {
         console.log('I am not a function')
@@ -16,11 +22,8 @@ class Home extends React.Component {
         }
     }
 
-    handleClick = () => {
-        console.log('home handle click')
-        API.getMessages().then( result => {
-            console.log(result);
-        });
+    updateTable = (messages) => {
+        this.setState({messages: messages.data}) 
     }
 
     componentDidMount() {
@@ -36,23 +39,13 @@ class Home extends React.Component {
          navigator.mediaDevices.getUserMedia(constraints).then(stream => {
             const mediaRecorder = new MediaRecorder(stream);
 
-            // create event handlers for the start and stop buttons
-            
-            
-          /*   stopBtn.onclick = function() {
-                mediaRecorder.stop();
-                console.log(mediaRecorder.state);
-                console.log("recorder stopped");
-            }
- */
             // Start recording when the record button is clicked
             // Stop automatically after five seconds.
             record.onclick = () => {
                 mediaRecorder.start();
                 setTimeout(function() {
                     mediaRecorder.stop();
-                }, 5000);
-                
+                }, 5000);     
             }
 
             // Process audio when the recording stops
@@ -65,7 +58,13 @@ class Home extends React.Component {
                 reader.onloadend = () => {
                     const base64data = reader.result;
                     // send the recording to the API
-                    API.sendMessage(base64data);
+                    API.sendMessage(base64data).then(() => {
+                        console.log('home sendMessage');
+                        API.getMessages().then(result => {
+                            console.log('home getMessages')
+                            this.updateTable(result);
+                        })
+                    });
                 }
             }
 
@@ -76,6 +75,10 @@ class Home extends React.Component {
         }).catch(function(err) {
             console.log('The following error occurred: ' + err);
         });
+
+        API.getMessages().then(result => {
+            this.setState({messages: result.data})
+        })
     }
 
     render() {
@@ -86,7 +89,7 @@ class Home extends React.Component {
                     <span>Click to Record:</span>
                     <button id="record" className="control" onClick={this.startRecord}></button>
                 </div>
-                <Table />
+                <Table passedMessages={this.state.messages}/>
             </div>
         )
     }
