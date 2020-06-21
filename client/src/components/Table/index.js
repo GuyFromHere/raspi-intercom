@@ -20,10 +20,10 @@ class Table extends React.Component {
             progress.style.width = `${progressBar}%`;
             progressBar += 25;
         }, 1000);
-
+        // Start play() then start playback animation
+        document.getElementById(id).play();
         setTimeout(() => {
             clearInterval(timer);
-            document.getElementById(id).play();
         }, 5000);
     }
 
@@ -36,7 +36,6 @@ class Table extends React.Component {
                         return (<tr key={item.id} className={item.played ? "played" : "unplayed"}>
                                 <div className="row">
                                     {item.date}
-                                {/* <td><audio controls src={item.message}>Play</audio></td> */}
                                     <i className="fas fa-play play" onClick={() => this.playMessage(item.id)}></i>
                                     <audio id={item.id} src={item.message}></audio>
                                     <div className="progress"><div className="progress-bar" ></div></div>
