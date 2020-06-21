@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../Button';
+/* import Button from '../Button'; */
 import Table from '../Table';
 import './style.css';
 import API from '../../utils/api';
@@ -18,12 +18,27 @@ class Home extends React.Component {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
             var base64data = reader.result;
-            console.log(base64data);
         }
     }
 
     updateTable = (messages) => {
+        console.log('home update table messages count')
+        console.log(messages.count)
         this.setState({messages: messages.data}) 
+    }
+
+    deleteMessage = (id) => {
+        console.log('home delete message id');
+        console.log(id)
+        API.deleteMessage(id).then((result) => {
+            console.log('home delete message result');
+            console.log(result);
+            API.getMessages().then(result => {
+                console.log('home deletemessage getmessage result length');
+                console.log(result.length)
+                this.updateTable(result);
+            })
+        });
     }
 
     componentDidMount() {
@@ -58,12 +73,13 @@ class Home extends React.Component {
                 reader.onloadend = () => {
                     const base64data = reader.result;
                     // send the recording to the API
-                    API.sendMessage(base64data).then(() => {
-                        console.log('home sendMessage');
-                        API.getMessages().then(result => {
-                            console.log('home getMessages')
-                            this.updateTable(result);
-                        })
+                    API.sendMessage(base64data).then((response) => {
+                        // if the message was saved successfully, update the messages in the table
+                        if ( response.status === 200 ) {
+                            API.getMessages().then(result => {
+                                this.updateTable(result);
+                            })
+                        }
                     });
                 }
             }
@@ -76,6 +92,7 @@ class Home extends React.Component {
             console.log('The following error occurred: ' + err);
         });
 
+        // Check for messages when the component loads
         API.getMessages().then(result => {
             this.setState({messages: result.data})
         })
@@ -89,7 +106,7 @@ class Home extends React.Component {
                     <span>Click to Record:</span>
                     <button id="record" className="control" onClick={this.startRecord}></button>
                 </div>
-                <Table passedMessages={this.state.messages}/>
+                <Table passedMessages={this.state.messages} handleDelete={this.deleteMessage}/>
             </div>
         )
     }

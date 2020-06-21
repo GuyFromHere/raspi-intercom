@@ -1,7 +1,10 @@
 const axios = require("axios");
 const express = require("express");
 const router = express.Router();
+const moment = require('moment');
 const config = require("config");
+
+
 const Message = require("../models/Message");
 
 console.log()
@@ -13,10 +16,17 @@ router.get("/", (req, res) => {
     // get messages currently in the database
     Message.find().then(result => {
         if ( result.length > 0 ) {
-            //res.json(result);
             console.log('GET /api/message');
-            //console.log(result);
-            res.json(result);
+            const newArr = result.map(item => {
+                return newObj = {
+                    message: item.message,
+                    date: moment(item.date).format('MMMM DD h:mm:ss a'),
+                    id: item._id
+                }
+            })
+            //console.log(newArr);
+            //res.json(result);
+            res.json(newArr);
         } else {
             res.json({ status: "no messages" });
         }
@@ -35,6 +45,22 @@ router.post("/send", (req, res) => {
     // send result to DB on the other device...
     Message.create(newObj).then(result => {
         res.json(result)
+    })
+})
+
+// @route   POST /api/message/delete/:id
+// @desc    Deletes the specified message from the database
+// @access  Public
+router.post("/delete/:id", (req, res) => {
+    console.log('server api delete id ')
+    console.log(req.params.id)
+    // Delete message with selected ID
+    Message.deleteOne({_id: req.params.id}).then((err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json(result)
+        } 
     })
 })
 

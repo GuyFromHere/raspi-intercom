@@ -13,6 +13,8 @@ export default {
     },
     // Clear a message once it has been listened to.
     deleteMessage: function (id) {
-        return axios.post('/api/message/' + id)
+        return axios.post('/api/message/delete/' + id).then(result => {
+            console.log('api deletemessage result')
+        })
     }
 }
