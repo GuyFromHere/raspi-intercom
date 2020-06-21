@@ -12,7 +12,19 @@ class Table extends React.Component {
 
     playMessage = (id) => {
         console.log('length = ' + document.getElementById(id).duration);
-        document.getElementById(id).play();
+        //document.getElementById(id).play();
+        let progressBar = 0;
+        const progress = document.getElementById(id).nextElementSibling.firstElementChild;
+        // playback progress bar
+        const timer = setInterval(() => {
+            progress.style.width = `${progressBar}%`;
+            progressBar += 25;
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(timer);
+            document.getElementById(id).play();
+        }, 5000);
     }
 
     render(props) {
@@ -25,9 +37,9 @@ class Table extends React.Component {
                                 <div className="row">
                                     {item.date}
                                 {/* <td><audio controls src={item.message}>Play</audio></td> */}
-                                    <audio id={item.id} src={item.message}></audio>
                                     <i className="fas fa-play play" onClick={() => this.playMessage(item.id)}></i>
-                                    <div className="progress-bar"></div>
+                                    <audio id={item.id} src={item.message}></audio>
+                                    <div className="progress"><div className="progress-bar" ></div></div>
                                     <i className="fas fa-trash-alt" onClick={() => this.props.handleDelete(item.id)}></i>
                                 </div>  
                             </tr>) 

@@ -25,6 +25,12 @@ class Home extends React.Component {
         });
     }
 
+    
+    startTimer = () => {
+        
+
+    }
+
     componentDidMount() {
         const record = document.querySelector('#record');
         const stopBtn = document.querySelector('#stop');
@@ -40,15 +46,20 @@ class Home extends React.Component {
             // Stop automatically after five seconds.
             record.onclick = () => {
                 mediaRecorder.start();
-                let c = 5;
-                /* setInterval(function() {
-                    console.log('here')
-                    this.setState({counter: this.state.counter-1});
-                    console.log(this.state.counter); */
-                    setTimeout(function() {
-                        mediaRecorder.stop();
-                    }, 5000);     
-                //}, 1000);
+
+                // countdown timer
+                const timer = setInterval(() => {
+                    const counter = this.state.counter - 1;
+                    this.setState({counter: counter})
+                }, 1000);
+        
+                setTimeout(() => {
+                    clearInterval(timer);
+                    mediaRecorder.stop();
+                    // reset counter
+                    this.setState({counter: 5});
+                }, 5000);
+ 
             }
 
             // Process audio when the recording stops
