@@ -1,6 +1,5 @@
 import React from 'react';
 /* import Row from '../Row'; */
-import API from '../../utils/api';
 import './style.css'
 
 class Table extends React.Component {
@@ -16,45 +15,21 @@ class Table extends React.Component {
         document.getElementById(id).play();
     }
 
-    /* deleteMessage = (id) => {
-        console.log('Table delete message id');
-        console.log(id)
-        API.deleteMessage(id).then((result) => {
-            console.log('Table delete message result');
-            console.log(result);
-            //this.refreshMessages();
-            API.getMessages().then(result => {
-                this.setState({messages: result.data}) 
-            })
-        });
-    } */
-
-    refreshMessages = () => {
-
-        // get messages from DB and put them in the table with renderTable()
-        API.getMessages().then(result => {
-            this.setState({messages: result.data}) 
-        })
-    }
-
-    componentDidMount(){
-        this.refreshMessages();
-    }
-
     render(props) {
         return (
-            <div className="table-messages">
+            <div className="table-messages container">
                 <table>
                     <tbody>
-                    {this.props.passedMessages ? this.props.passedMessages.map(item => {
+                    {this.props.passedMessages.length ? this.props.passedMessages.map(item => {
                         return (<tr key={item.id} className={item.played ? "played" : "unplayed"}>
-                            <td>{item.date}</td>
-                            {/* <td><audio controls src={item.message}>Play</audio></td> */}
-                            <td>
-                                <audio id={item.id} src={item.message}></audio>
-                                <button onClick={() => this.playMessage(item.id)}>Play</button> 
-                                <button onClick={() => this.props.handleDelete(item.id)}>Delete</button>
-                            </td>
+                                <div className="row">
+                                    {item.date}
+                                {/* <td><audio controls src={item.message}>Play</audio></td> */}
+                                    <audio id={item.id} src={item.message}></audio>
+                                    <i className="fas fa-play play" onClick={() => this.playMessage(item.id)}></i>
+                                    <div className="progress-bar"></div>
+                                    <i className="fas fa-trash-alt" onClick={() => this.props.handleDelete(item.id)}></i>
+                                </div>  
                             </tr>) 
                         }) : null
                     }

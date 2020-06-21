@@ -8,44 +8,26 @@ class Home extends React.Component {
     constructor() {
         super();
         this.state = {
-          messages: []
+          messages: [],
+          counter: 5
         };
       }
 
-    getBase64Audio = (file) => {
-        console.log('I am not a function')
-        var reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            var base64data = reader.result;
-        }
-    }
-
     updateTable = (messages) => {
-        console.log('home update table messages count')
-        console.log(messages.count)
         this.setState({messages: messages.data}) 
     }
 
     deleteMessage = (id) => {
-        console.log('home delete message id');
-        console.log(id)
-        API.deleteMessage(id).then((result) => {
-            console.log('home delete message result');
-            console.log(result);
-            API.getMessages().then(result => {
-                console.log('home deletemessage getmessage result length');
-                console.log(result.length)
-                this.updateTable(result);
+        API.deleteMessage(id).then(() => {
+            API.getMessages().then(results => {
+                this.updateTable(results);
             })
         });
     }
 
     componentDidMount() {
         const record = document.querySelector('#record');
-        //const play = document.querySelector('.play');
         const stopBtn = document.querySelector('#stop');
-        //const soundClips = document.querySelector('.sound-clips');
         // Array to hold the audio chunks
         let chunks = [];
         const constraints = { audio: true };
@@ -58,14 +40,20 @@ class Home extends React.Component {
             // Stop automatically after five seconds.
             record.onclick = () => {
                 mediaRecorder.start();
-                setTimeout(function() {
-                    mediaRecorder.stop();
-                }, 5000);     
+                let c = 5;
+                /* setInterval(function() {
+                    console.log('here')
+                    this.setState({counter: this.state.counter-1});
+                    console.log(this.state.counter); */
+                    setTimeout(function() {
+                        mediaRecorder.stop();
+                    }, 5000);     
+                //}, 1000);
             }
 
             // Process audio when the recording stops
             mediaRecorder.onstop = (e) => {
-                var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+                const blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
                 chunks = [];
                 // Use FileReader to convert the blob data to base64 so we can store it as a string
                 let reader = new FileReader();
@@ -101,10 +89,11 @@ class Home extends React.Component {
     render() {
 
         return(
-            <div className="home">
+            <div className="home container">
                 <div className="control-container">
-                    <span>Click to Record:</span>
+                    <span id="title">Click to Record:</span>
                     <button id="record" className="control" onClick={this.startRecord}></button>
+                    <span id="counter">{this.state.counter}</span>
                 </div>
                 <Table passedMessages={this.state.messages} handleDelete={this.deleteMessage}/>
             </div>

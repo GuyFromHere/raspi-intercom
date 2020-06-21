@@ -16,16 +16,13 @@ router.get("/", (req, res) => {
     // get messages currently in the database
     Message.find().then(result => {
         if ( result.length > 0 ) {
-            console.log('GET /api/message');
             const newArr = result.map(item => {
                 return newObj = {
                     message: item.message,
-                    date: moment(item.date).format('MMMM DD h:mm:ss a'),
+                    date: moment(item.date).format('MMMM DD h:mm a'),
                     id: item._id
                 }
             })
-            //console.log(newArr);
-            //res.json(result);
             res.json(newArr);
         } else {
             res.json({ status: "no messages" });
@@ -52,10 +49,8 @@ router.post("/send", (req, res) => {
 // @desc    Deletes the specified message from the database
 // @access  Public
 router.post("/delete/:id", (req, res) => {
-    console.log('server api delete id ')
-    console.log(req.params.id)
     // Delete message with selected ID
-    Message.deleteOne({_id: req.params.id}).then((err, result) => {
+    Message.findByIdAndRemove({_id: req.params.id}, {useFindAndModify: false}, (err, result) => {
         if (err) {
             console.log(err);
         } else {
