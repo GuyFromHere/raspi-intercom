@@ -4,6 +4,8 @@ Voice intercom system connecting two raspberry pis
 
 # Description
 
+**THIS PROJECT IS CURRENTLY UNDER CONSTRUCTION**
+
 My in laws built a house next door. We share a mesh wifi system between both houses. In my house we use the Amazon Echo "announce" feature frequently to rouse children from bed, let them know when dinner is ready or chores need doing, etc. My in laws don't want to put an Echo in their house but we still want a convenient method for communicating between the houses. I had a few old raspberry pis lying around and I thought it would be a fun project to design some kind of intercom system with them. It's a very specific use case but I'm making it public in hopes that it helps someone else with their project someday.
 
 The goal is to create a simple React web page with a Node / Mongo backend. Both Pis will use the official Raspberry Pi [touchscreen](https://www.raspberrypi.org/products/raspberry-pi-touch-display/) (I haven't bought these yet!). Connecting to the web page from one Pi, you can record a short message that will be added to the other Pi's homepage via web sockets and saved to the database so it can be listened to at a later date. The Pis will authenticate with the web page and their messages will be retrieved by an account ID. 
@@ -11,6 +13,10 @@ The goal is to create a simple React web page with a Node / Mongo backend. Both 
 The initial implementation will work like a voice mail box. Messages are posted to a web page that updates periodically and users will have to check the page for updates. Eventually I want it to work like a real analog intercom playing the messages in real time as they are recorded -- but also saving them so they can be replayed and deleted as desired. Since it will all be running on the same network you won't have to be standing at the Pi to send a message. You can use your phone as long as it's on the wifi.
 
 Again, it's a very specific use case. But it was fun! I hope to make it more useful over time. 
+
+Here is a (very early!) preview of the app in action.
+
+![Example](example.gif)
 
 # Instructions 
 
