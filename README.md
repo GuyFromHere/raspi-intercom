@@ -4,23 +4,38 @@ Voice intercom system connecting two raspberry pis
 
 # Description
 
-My in laws built a house next door. We bought a mesh wifi system to share our internet connection and we would like to have a convenient and efficient method of communicating between the houses. 
+My in laws built a house next door. We share a mesh wifi system between both houses. In my house we use the Amazon Echo "announce" feature frequently to rouse children from bed, let them know when dinner is ready or chores need doing, etc. My in laws don't want to put an Echo in their house but we still want a convenient method for communicating between the houses. I had a few old raspberry pis lying around and I thought it would be a fun project to design some kind of intercom system with them. It's a very specific use case but I'm making it public in hopes that it helps someone else with their project someday.
 
-My plan is to start with the pieces I think I can accomplish with my current skills and build out the features I really want after I have a functional solution.
+The goal is to create a simple React web page with a Node / Mongo backend. Both Pis will use the official Raspberry Pi [touchscreen](https://www.raspberrypi.org/products/raspberry-pi-touch-display/) (I haven't bought these yet!). Connecting to the web page from one Pi, you can record a short message that will be added to the other Pi's homepage via web sockets and saved to the database so it can be listened to at a later date. The Pis will authenticate with the web page and their messages will be retrieved by an account ID. 
+
+The initial implementation will work like a voice mail box. Messages are posted to a web page that updates periodically and users will have to check the page for updates. Eventually I want it to work like a real analog intercom playing the messages in real time as they are recorded -- but also saving them so they can be replayed and deleted as desired. Since it will all be running on the same network you won't have to be standing at the Pi to send a message. You can use your phone as long as it's on the wifi.
+
+Again, it's a very specific use case. But it was fun! I hope to make it more useful over time. 
 
 # Instructions 
 
 ## Set up dev environment
 
-For my development environment I'm using Hyper-V with two VMs running Raspbian Buster to simulate the hardware I'll be using. I am running them and the Node server from my laptop. This means I need to set up virtual switches with a static NAT so they can use my wireless card without disrupting my internet connection. The alternative would be using an internal switch bound to a spare NIC. That could work if I stayed at my desk at all times, but I like to work from my couch. There's better dog-snuggling over there. 
+For my development environment I'm using Hyper-V with two VMs running Raspbian Buster to simulate the hardware I'll be using. I am running them and the Node server from my laptop. The downside to using Linux VMs for this project is that I have not figured out how to passthrough a microphone. This means the MediaRecorder API does not load because it can't find a media device. And therefore, it's impossible to test the app on the dev VMs. So **I do not recommend using VMs.** They were helpful when I was getting everything set up initially, but as soon as I had a functioning prototype I had to switch to actual physical Pis. 
 
-To provision the VMs and switches I wrote the powershell script in **setup/Create-RaspbianVm.ps1**. All the properties for the VMs and the switches are defined in the top part of the script. Before running make sure you edit these to suit your own needs. 
+That being said, I've included the scripts I used to deploy the VMs for posterity. To provision the VMs and virtual switches I wrote the powershell script in **setup/Create-RaspbianVm.ps1**. Run it in an elevated window and it will pull in the included helper functions so long as they are all located in the same directory. All the properties for the VMs and the switches are defined in the top part of the script. Before running make sure you edit these to suit your own needs. Since I'm using my laptop I had to create internal virtual switches with a static NAT then set static IPs on the VMs. My home network is a Class A 10.x.x.x. so VM1 has an IP of 10.1.0.2 with a gateway of 10.1.0.1 (also the IP of the NAT interface). VM2 has an IP of 10.2.0.2 with a gateway of 10.2.0.1 (the IP of that NAT interface). 
 
-The VMs will boot to the specified Raspbian ISO when the script finishes. You'll need to walk through the installer and configure the static IPs to match the given subnet. 
+In Raspbian Buster you need to set the static ip in **/etc/dhcpcd.conf**. In prior versions of Raspbian it was in /etc/interfaces so be aware that this could change depending on the build.
 
-In Raspbian Buster you need to set a static ip in **/etc/dhcpcd.conf**. Make sure you're setting it on the correct interface! eth0 should be assigned to the private switch since that's the one we're attaching in the New-VM command. eth1 is the one that needs a static IP on your NAT switch. I've included a script that will auto create a new dhcpcd.conf file on a mounted Raspbian image in WSL2. If you don't have WSL2 (or access to any other means to mount, edit, then convert the img file) you will have to manually change the file after installing Raspbian.
+If you don't use VMs you can check out the instructions in **setup/Setup-Raspbian.md** for the steps I took to configure the Pis after installing them. Once SSH is enabled you can pretty much copy and paste all the code snippets and you'll be all set. 
 
-# Basic functionality
+# Technology Used
+
+Node
+MongoDB
+React 
+MediaRecorder API
+WebSockets API
+PowerShell
+Raspbian Buster
+Hyper-V
+
+# Development Roadmap
 
 Stage 1: 
 
@@ -32,9 +47,7 @@ User selects which device dbs they want to broadcast to then clicks the record b
 
 They have five or ten seconds to record a message
 
-When they take their hand off the button the message is posted to the target database
-
-The device listening to that database updates its state to show that there are un-heard messagesT
+The device listening to that database updates its state to show that there are un-heard messages
 
 A listener can listen to a message and mark it for deletion
 
