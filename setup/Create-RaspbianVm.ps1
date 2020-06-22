@@ -4,6 +4,12 @@
 param($Cleanup=$False)
 
 <####
+Source Helper Functions
+####>
+# Source all ps1 files in the current directory except for this script
+(Get-ChildItem -Path . -Exclude $MyInvocation.MyCommand | Where-Object{ $_.Name -like "*ps1" }).ForEach{ . $_.FullName }
+
+<####
 VM Properties
 ####>
 # Default Raspbian VM Properties
@@ -27,12 +33,6 @@ $DefaultVHDProperties = @{
 <####
 Switch Properties    
 ####>
-# Private switch for connecting the two VMs
-$PrivateSwitchProperties = @{
-    SwitchName = "sw-prv-intercom";
-    SwitchType = "private";
-}
-
 # Internal switches with static NAT 
 # Once created they can access the dev server on 10.1.0.1:3000 and 10.2.0.1:3000, respectively.
 $SwitchProperties01 = @{
@@ -70,9 +70,6 @@ if ($Cleanup) {
         }
         Sleep 3
     }
-    if (Get-VmSwitch $PrivateSwitchProperties.Name) {
-        Remove-VMSwitch -Name $PrivateSwitchProperties.Name -Force
-    }
     if ( Get-VMSwitch $SwitchProperties01.SwitchName ) {
         Remove-NewInternalNatSwitch -NatName $SwitchProperties01.NatName -SwitchName $SwitchProperties01.SwitchName -GwIp $SwitchProperties01.GwIp
     }
@@ -84,7 +81,6 @@ if ($Cleanup) {
 
 
 # Create Switches
-New-VMSwitch @PrivateSwitchProperties
 New-InternalNatSwitch @SwitchProperties01
 New-InternalNatSwitch @SwitchProperties02
 
@@ -94,13 +90,13 @@ $Name.ForEach{
     # Create VHD for each VM
     New-VHD -Path ($DefaultVHDProperties.VHDPath + $_ + ".vhdx") -SizeBytes $DefaultVHDProperties.VHDSizeBytes -Dynamic -BlockSizeBytes $DefaultVHDProperties.BlockSizeBytes
     # Create the VMs
-    #New-VM -Name $_ -MemoryStartupBytes $MemoryStartupBytes -SwitchName $PrivateSwitchProperties.Name -Generation $Generation -Path $VmPath -VHDPath ($DefaultVHDProperties.VHDPath + $_ + ".vhdx")
-    New-VM -Name $_ -SwitchName $PrivateSwitchProperties.Name -Generation $Generation -Path $VmPath -VHDPath ($DefaultVHDProperties.VHDPath + $_ + ".vhdx")
+
+    New-VM -Name $_ -Generation $Generation -Path $VmPath -VHDPath ($DefaultVHDProperties.VHDPath + $_ + ".vhdx")
     Set-VMMemory -VMName $_  -DynamicMemoryEnabled $true -MinimumBytes $MinimumBytes -StartupBytes $StartupBytes -MaximumBytes $MaximumBytes -Buffer 20 -Priority 50 
     Sleep 5
     # After a brief pause to let the last operation complete, add hardware components and start 'er up.
     Set-VMDvdDrive -VMName $_ -Path $ISOPath
     # Commenting out net adapter so we can add it after configuring vm with default adapter
-    #Add-VMNetworkAdapter -VMName $_ -SwitchName "sw-nat-$VmIdentifier" -Name "InternalNetwork"
+    Add-VMNetworkAdapter -VMName $_ -SwitchName "sw-nat-$VmIdentifier" -Name "InternalNetwork"
     Start-VM -Name $_
 }
