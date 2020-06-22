@@ -11,6 +11,7 @@
 }
 
 #title, #counter {
+    color: black;
     margin: 1rem;
 }
 
