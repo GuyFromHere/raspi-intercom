@@ -33,6 +33,7 @@ io.on('connection', (socket) => {
     // Probably need to figure out authentication first.
     socket.on('intercom message', (msg) => {
         console.log('intercom msg received. Now broadcasting');
+        //console.log(msg);
         // use io.emit for testing:
         //socket.broadcast.emit('intercom message', msg);
         io.emit('intercom message', msg);

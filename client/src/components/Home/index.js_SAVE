@@ -30,12 +30,6 @@ class Home extends React.Component {
         });
     }
 
-    
-    startTimer = () => {
-        
-
-    }
-
     componentDidMount() {
         const record = document.querySelector('#record');
         const stopBtn = document.querySelector('#stop');
