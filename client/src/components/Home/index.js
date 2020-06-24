@@ -3,110 +3,46 @@ import React from 'react';
 import Table from '../Table';
 import './style.css';
 import API from '../../utils/api';
+import socketApi from '../../utils/socketApi';
+import socketIOClient from "socket.io-client";
 
+var socket;
 class Home extends React.Component {
     constructor() {
         super();
         this.state = {
-          messages: [],
-          counter: 5
+            chat: []
         };
+        let endpoint = 'http://i7590:3001/';
+        socket = socketIOClient(endpoint);
       }
 
-    updateTable = (messages) => {
-        this.setState({messages: messages.data}) 
+    handleChat = e => {
+        e.preventDefault();
+        const chatMessage = document.getElementById('input-chat');
+        //socketApi.subscribeToChat(chatMessage);
+        socket.emit('chat message', chatMessage.value);
+        chatMessage.value = "";
     }
 
-    deleteMessage = (id) => {
-        API.deleteMessage(id).then(() => {
-            API.getMessages().then(results => {
-                this.updateTable(results);
-            })
-        });
-    }
-
-    
-    startTimer = () => {
-        
-
+    recieveMessage = (msg) => {
+        let chatHistory = this.state.chat;
+        chatHistory.push(<li>{msg}</li>)
+        this.setState({chat: chatHistory});
     }
 
     componentDidMount() {
-        const record = document.querySelector('#record');
-        const stopBtn = document.querySelector('#stop');
-        // Array to hold the audio chunks
-        let chunks = [];
-        const constraints = { audio: true };
-
-         // get microphone and create mediarecorder when the page loads
-         navigator.mediaDevices.getUserMedia(constraints).then(stream => {
-            const mediaRecorder = new MediaRecorder(stream);
-
-            // Start recording when the record button is clicked
-            // Stop automatically after five seconds.
-            record.onclick = () => {
-                mediaRecorder.start();
-
-                // countdown timer
-                const timer = setInterval(() => {
-                    const counter = this.state.counter - 1;
-                    this.setState({counter: counter})
-                }, 1000);
-        
-                setTimeout(() => {
-                    clearInterval(timer);
-                    mediaRecorder.stop();
-                    // reset counter
-                    this.setState({counter: 5});
-                }, 5000);
- 
-            }
-
-            // Process audio when the recording stops
-            mediaRecorder.onstop = (e) => {
-                const blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
-                chunks = [];
-                // Use FileReader to convert the blob data to base64 so we can store it as a string
-                let reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    const base64data = reader.result;
-                    // send the recording to the API
-                    API.sendMessage(base64data).then((response) => {
-                        // if the message was saved successfully, update the messages in the table
-                        if ( response.status === 200 ) {
-                            API.getMessages().then(result => {
-                                this.updateTable(result);
-                            })
-                        }
-                    });
-                }
-            }
-
-            mediaRecorder.ondataavailable = (e) => {
-               chunks.push(e.data);
-               
-            }
-        }).catch(function(err) {
-            console.log('The following error occurred: ' + err);
-        });
-
-        // Check for messages when the component loads
-        API.getMessages().then(result => {
-            this.setState({messages: result.data})
-        })
+        socket.on("chat message", this.recieveMessage);
+        //socket.on("intercom message", this.recieveRecording);
     }
 
     render() {
-
         return(
             <div className="home container">
-                <div className="control-container">
-                    <span id="title">Click to Record:</span>
-                    <button id="record" className="control" onClick={this.startRecord}></button>
-                    <span id="counter">{this.state.counter}</span>
+                <div className="chat-container">
+                    <input type="text" id="input-chat"></input><button id="btn-chat" onClick={(e) => this.handleChat(e)}>Send</button>
                 </div>
-                <Table passedMessages={this.state.messages} handleDelete={this.deleteMessage}/>
+                <ul id="message-go-here">{this.state.chat}</ul>
             </div>
         )
     }

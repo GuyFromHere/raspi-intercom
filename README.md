@@ -33,12 +33,19 @@ If you don't use VMs you can check out the instructions in **setup/Setup-Raspbia
 # Technology Used
 
 Node
+
 MongoDB
+
 React 
+
 MediaRecorder API
-WebSockets API
+
+WebSockets API / Socket.IO
+
 PowerShell
+
 Raspbian Buster
+
 Hyper-V
 
 # Development Roadmap
@@ -62,3 +69,9 @@ Stage 2:
 Websockets for real time messaging via the phone UI
 
 Physical buttons on the pis so they act like analog intercoms
+
+# Attributions
+
+My media recorder code is a variation on the MDN article for the MediaRecorder API. 
+
+I learned a lot about the WebSocket API from [this article](https://medium.com/hackernoon/implementing-a-websocket-server-with-node-js-d9b78ec5ffa8) but ultimately decided to use socket.io. I used the documentation on the socket.io website to ramp up then cobbled together my own React implementation with inspiration from [this article](https://itnext.io/building-a-node-js-websocket-chat-app-with-socket-io-and-react-473a0686d1e1) and [others](https://solvemprobler.com/blog/2013/06/16/reactjs-and-socket-dot-io-chat-application/). 

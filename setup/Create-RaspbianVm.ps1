@@ -4,12 +4,6 @@
 param($Cleanup=$False)
 
 <####
-Source Helper Functions
-####>
-# Source all ps1 files in the current directory except for this script
-(Get-ChildItem -Path . -Exclude $MyInvocation.MyCommand | Where-Object{ $_.Name -like "*ps1" }).ForEach{ . $_.FullName }
-
-<####
 VM Properties
 ####>
 # Default Raspbian VM Properties
@@ -51,9 +45,10 @@ $SwitchProperties02 = @{
 }
 
 <####
-Source Functions
+Source Helper Functions
 ####>
-Get-ChildItem -Include *.ps1
+# Source all ps1 files in the current directory except for this script
+(Get-ChildItem -Path . -Exclude $MyInvocation.MyCommand | Where-Object{ $_.Name -like "*ps1" }).ForEach{ . $_.FullName }
 
 <####
 Cleanup 
@@ -90,7 +85,6 @@ $Name.ForEach{
     # Create VHD for each VM
     New-VHD -Path ($DefaultVHDProperties.VHDPath + $_ + ".vhdx") -SizeBytes $DefaultVHDProperties.VHDSizeBytes -Dynamic -BlockSizeBytes $DefaultVHDProperties.BlockSizeBytes
     # Create the VMs
-
     New-VM -Name $_ -Generation $Generation -Path $VmPath -VHDPath ($DefaultVHDProperties.VHDPath + $_ + ".vhdx")
     Set-VMMemory -VMName $_  -DynamicMemoryEnabled $true -MinimumBytes $MinimumBytes -StartupBytes $StartupBytes -MaximumBytes $MaximumBytes -Buffer 20 -Priority 50 
     Sleep 5

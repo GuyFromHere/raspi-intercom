@@ -1,19 +1,52 @@
-// http://172.18.119.223:3000
+
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const config = require("config");
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
 const port = process.env.PORT || 3001;
 
+// socket.io section
+io.on('connection', (socket) => {
+
+    console.log('a user connected');
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+    
+    // Get chat message and broadcast it to the client
+    // io.emit('chat message', msg); will send the message to all connected clients
+    // socket.broadcast.emit('chat message', msg); Will exclude the sender when returning result to clients 
+    socket.on('chat message', (msg) => {
+        console.log('server message: ' + msg);
+        io.emit('chat message', msg);
+        //socket.broadcast.emit('chat message', msg);
+    });
+
+    // Gets base64 encoded message data from the client and broadcasts it
+    // Find a way to broadcast to specific clients...i.e. send user id in msg object from client
+    // Probably need to figure out authentication first.
+    socket.on('intercom message', (msg) => {
+        console.log('intercom msg received. Now broadcasting');
+        // use io.emit for testing:
+        //socket.broadcast.emit('intercom message', msg);
+        io.emit('intercom message', msg);
+    });
+});
+
+
+// normal express section
 // Body Parser middleware
 // Limit the size of the body to 5mb
 app.use(express.json({ limit: "5mb" }));
 
 // connect to DB
-mongoose
-	.connect(process.env.MONGODB_URI || config.get("MONGODB_URI"), {
+mongoose.connect(process.env.MONGODB_URI || config.get("MONGODB_URI"), {
 		useNewUrlParser: true,
 		useCreateIndex: true,
 		useUnifiedTopology: true,
@@ -35,4 +68,7 @@ if (process.env.NODE_ENV === "production") {
 	});
 }
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+// app.listen(port, () => {
+http.listen(port, () => {
+  console.log(`listening on *:${port}`);
+});

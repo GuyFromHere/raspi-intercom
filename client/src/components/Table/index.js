@@ -34,13 +34,15 @@ class Table extends React.Component {
                     <tbody>
                     {this.props.passedMessages.length ? this.props.passedMessages.map(item => {
                         return (<tr key={item.id} className={item.played ? "played" : "unplayed"}>
-                                <div className="row">
-                                    {item.date}
-                                    <i className="fas fa-play play" onClick={() => this.playMessage(item.id)}></i>
-                                    <audio id={item.id} src={item.message}></audio>
-                                    <div className="progress"><div className="progress-bar" ></div></div>
-                                    <i className="fas fa-trash-alt" onClick={() => this.props.handleDelete(item.id)}></i>
-                                </div>  
+                                <td>
+                                    <div className="row">
+                                        {item.date}
+                                        <i className="fas fa-play play" onClick={() => this.playMessage(item.id)}></i>
+                                        <audio id={item.id} src={item.message}></audio>
+                                        <div className="progress"><div className="progress-bar" ></div></div>
+                                        <i className="fas fa-trash-alt" onClick={() => this.props.handleDelete(item.id)}></i>
+                                    </div>  
+                                </td>
                             </tr>) 
                         }) : null
                     }
